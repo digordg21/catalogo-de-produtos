@@ -1,0 +1,29 @@
+@Catalogo_de_Produtos_HostAddress = http://localhost:5217
+
+### Listar todas as categoria
+GET {{Catalogo_de_Produtos_HostAddress}}/api/categoria
+
+### Listar categoria por ID
+GET {{Catalogo_de_Produtos_HostAddress}}/api/categoria/2
+
+### Criar nova categoria
+POST {{Catalogo_de_Produtos_HostAddress}}/api/categoria
+Content-Type: application/json
+
+{
+  "nome": "Fones",
+  "descricao": "Categoria para fones de ouvidos e headsets"
+}
+
+### Atualizar categoria existente
+PUT {{Catalogo_de_Produtos_HostAddress}}/api/categoria/5
+Content-Type: application/json
+
+{
+  "id": 5,
+  "nome": "Teclados",
+  "descricao": "Categoria para cadastro de teclados de membrana, comuns, mecanicos e magneticos"
+}
+
+### Deletar categoria
+DELETE {{Catalogo_de_Produtos_HostAddress}}/api/categoria/15
