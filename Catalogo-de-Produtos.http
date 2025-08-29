@@ -1,6 +1,61 @@
 @Catalogo_de_Produtos_HostAddress = http://localhost:5217
 
-GET {{Catalogo_de_Produtos_HostAddress}}/weatherforecast/
-Accept: application/json
+### Listar todas as categoria
+GET {{Catalogo_de_Produtos_HostAddress}}/api/categoria
 
-###
+### Listar categoria por ID
+GET {{Catalogo_de_Produtos_HostAddress}}/api/categoria/5
+
+### Criar nova categoria
+POST {{Catalogo_de_Produtos_HostAddress}}/api/categoria
+Content-Type: application/json
+
+{
+  "nome": "Fones",
+  "descricao": "Categoria para fones de ouvidos e headsets"
+}
+
+### Atualizar categoria existente
+PUT {{Catalogo_de_Produtos_HostAddress}}/api/categoria/5
+Content-Type: application/json
+
+{
+  "id": 5,
+  "nome": "Teclados",
+  "descricao": "Categoria para cadastro de teclados de membrana, comuns, mecanicos e magneticos"
+}
+
+### Deletar categoria
+DELETE {{Catalogo_de_Produtos_HostAddress}}/api/categoria/2
+
+### Consultar todos os Produtos
+GET {{{{Catalogo_de_Produtos_HostAddress}}}}/api/produto
+
+### Listar produto por ID
+GET {{Catalogo_de_Produtos_HostAddress}}/api/produto/3
+
+### Criar nova produto
+POST {{Catalogo_de_Produtos_HostAddress}}/api/produto
+Content-Type: application/json
+
+{
+  "nome": "Fone maneiro",
+  "preco": 70.99,
+  "descricao": "Fone legal",
+  "categoriaId": 3
+}
+
+### Atualizar produto existente
+PUT {{Catalogo_de_Produtos_HostAddress}}/api/produto/4
+Content-Type: application/json
+
+{
+  "id": 4,
+  "nome": "Fone 4 - atualizado",
+  "preco": 70.99,
+  "descricao": "Fone legal",
+  "categoriaId": 3
+}
+
+### Deletar produto
+DELETE {{Catalogo_de_Produtos_HostAddress}}/api/produto/3

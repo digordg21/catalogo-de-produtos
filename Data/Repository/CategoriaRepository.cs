@@ -38,8 +38,7 @@ public class CategoriaRepository
     public void Delete(int id)
     {
         var categoria = Get(id);
-        if (categoria is null)
-            return;
+        if (categoria is null) return;
 
         _context.Categorias.Remove(categoria);
         _context.SaveChanges();

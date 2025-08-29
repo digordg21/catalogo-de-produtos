@@ -3,31 +3,31 @@ using Catalogo.Data.Repository;
 using Catalogo.Data;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Catalogo.Controllers;
+namespace Categorias.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 
 public class CategoriaController : ControllerBase
 {
-    CategoriaRepository repository;
+    CategoriaRepository categoriaRepository;
     public CategoriaController(CategoriaRepository _repository)
     {
-        repository = _repository;
+        categoriaRepository = _repository;
     }
 
     // Listar todas as categorias
     [HttpGet]
     public ActionResult<List<Categoria>> GetAll()
     {
-        return repository.GetAll();
+        return categoriaRepository.GetAll();
     }
 
     // Listar uma categoria pelo Id
     [HttpGet("{id}")]
     public ActionResult<Categoria> Get(int id)
     {
-        var categoria = repository.Get(id);
+        var categoria = categoriaRepository.Get(id);
         if (categoria is null)
             return NotFound("Categoria não encontrada.");
 
@@ -41,7 +41,7 @@ public class CategoriaController : ControllerBase
         if (string.IsNullOrEmpty(categoria.Nome))
             return BadRequest("O nome da categoria é obrigatório.");
 
-        repository.Add(categoria);
+        categoriaRepository.Add(categoria);
         return CreatedAtAction(nameof(Get), new { id = categoria.Id }, categoria);
     }
 
@@ -49,11 +49,11 @@ public class CategoriaController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        var categoria = repository.Get(id);
+        var categoria = categoriaRepository.Get(id);
         if (categoria is null)
             return NotFound("Categoria não encontrada.");
 
-        repository.Delete(id);
+        categoriaRepository.Delete(id);
         return NoContent();
     }
 
@@ -64,11 +64,11 @@ public class CategoriaController : ControllerBase
         if (id != categoria.Id)
             return BadRequest();
 
-        var existingCategoria = repository.Get(id);
+        var existingCategoria = categoriaRepository.Get(id);
         if (existingCategoria is null)
             return NotFound("Categoria não encontrada.");
 
-        repository.Update(categoria);
+        categoriaRepository.Update(categoria);
         return NoContent();
     }
 }
