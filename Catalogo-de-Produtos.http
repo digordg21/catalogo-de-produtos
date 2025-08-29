@@ -28,8 +28,12 @@ Content-Type: application/json
 ### Deletar categoria
 DELETE {{Catalogo_de_Produtos_HostAddress}}/api/categoria/2
 
+
 ### Consultar todos os Produtos
 GET {{{{Catalogo_de_Produtos_HostAddress}}}}/api/produto
+
+### Consultar Produtos com filtros e paginacao
+GET {{{{Catalogo_de_Produtos_HostAddress}}}}/api/produto?categoriaId=3
 
 ### Listar produto por ID
 GET {{Catalogo_de_Produtos_HostAddress}}/api/produto/3
@@ -39,9 +43,9 @@ POST {{Catalogo_de_Produtos_HostAddress}}/api/produto
 Content-Type: application/json
 
 {
-  "nome": "Fone maneiro",
-  "preco": 70.99,
-  "descricao": "Fone legal",
+  "nome": "Fone O melhor Fone do MERCADO 16.2 v32",
+  "preco": 149.99,
+  "descricao": "Esse aqaui é o top top top do top",
   "categoriaId": 3
 }
 

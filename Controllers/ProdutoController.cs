@@ -87,11 +87,26 @@ public class ProdutoController : ControllerBase
 
 
         // Validação de categoria existente
-            var categoria = categoriaRepository.Get(produto.CategoriaId);
+        var categoria = categoriaRepository.Get(produto.CategoriaId);
         if (categoria is null)
             return BadRequest("Categoria não encontrada");
 
         produtoRepository.Update(produto);
         return NoContent();
     }
+
+    [HttpGet("paged")]
+    public ActionResult<PagedResult<Produto>> GetAllPaged(
+        int? categoriaId,
+        decimal? minPrice,
+        decimal? maxPrice,
+        int page = 1,
+        int pageSize = 5
+    )
+    {
+        var result = produtoRepository.GetAllPaged(categoriaId, minPrice, maxPrice, page, pageSize);
+        return Ok(result);
+
+    }
+    
 }
