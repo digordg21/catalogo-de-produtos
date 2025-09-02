@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Catalogo.Data;
 using Catalogo.Data.Repository;
 using Catalogo.Models;
@@ -20,6 +21,7 @@ public class ProdutoController : ControllerBase
     }
 
     // Listar todos os Produtos
+    [Authorize]
     [HttpGet]
     public ActionResult<List<Produto>> GetAll()
     {
@@ -27,6 +29,7 @@ public class ProdutoController : ControllerBase
     }
 
     // Listar produto por ID
+    [Authorize]
     [HttpGet("{id}")]
     public ActionResult<Produto> Get(int id)
     {
@@ -38,6 +41,7 @@ public class ProdutoController : ControllerBase
     }
 
     //Criar Produto
+    [Authorize]
     [HttpPost]
     public ActionResult<Produto> Create(Produto produto)
     {
@@ -58,6 +62,7 @@ public class ProdutoController : ControllerBase
     }
 
     // Deletar um produto por ID
+    [Authorize]
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
@@ -70,6 +75,7 @@ public class ProdutoController : ControllerBase
     }
 
     // Atualizar um produto por Id
+    [Authorize]
     [HttpPut("{id}")]
     public IActionResult Update(int id, Produto produto)
     {
@@ -95,6 +101,7 @@ public class ProdutoController : ControllerBase
         return NoContent();
     }
 
+    [Authorize]
     [HttpGet("paged")]
     public ActionResult<PagedResult<Produto>> GetAllPaged(
         int? categoriaId,
@@ -108,5 +115,5 @@ public class ProdutoController : ControllerBase
         return Ok(result);
 
     }
-    
+
 }
