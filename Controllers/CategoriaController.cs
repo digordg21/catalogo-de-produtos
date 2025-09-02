@@ -2,6 +2,7 @@ using Catalogo.Models;
 using Catalogo.Data.Repository;
 using Catalogo.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Categorias.Controllers;
 
@@ -17,6 +18,7 @@ public class CategoriaController : ControllerBase
     }
 
     // Listar todas as categorias
+    [Authorize]
     [HttpGet]
     public ActionResult<List<Categoria>> GetAll()
     {
@@ -24,6 +26,7 @@ public class CategoriaController : ControllerBase
     }
 
     // Listar uma categoria pelo Id
+    [Authorize]
     [HttpGet("{id}")]
     public ActionResult<Categoria> Get(int id)
     {
@@ -35,6 +38,7 @@ public class CategoriaController : ControllerBase
     }
 
     // Criar uma nova categoria
+    [Authorize]
     [HttpPost]
     public IActionResult Create(Categoria categoria)
     {
@@ -46,6 +50,7 @@ public class CategoriaController : ControllerBase
     }
 
     // Deletar uma categoria por id
+    [Authorize]
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
@@ -58,6 +63,7 @@ public class CategoriaController : ControllerBase
     }
 
     // Atualizar uma categoria por id
+    [Authorize]
     [HttpPut("{id}")]
     public IActionResult Update(int id, Categoria categoria)
     {

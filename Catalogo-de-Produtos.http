@@ -70,6 +70,15 @@ Content-Type: application/json
 
 {
   "fullName": "Rodrigo Abed de Andrade",
-  "email": "abed@teste.com",
+  "email": "abed2@teste.com",
+  "senha": "Abed@123"
+}
+
+### login da aplicação
+POST {{Catalogo_de_Produtos_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "abed2@teste.com",
   "senha": "Abed@123"
 }
