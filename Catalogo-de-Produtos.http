@@ -36,7 +36,7 @@ GET {{{{Catalogo_de_Produtos_HostAddress}}}}/api/produto
 GET {{{{Catalogo_de_Produtos_HostAddress}}}}/api/produto?categoriaId=3
 
 ### Listar produto por ID
-GET {{Catalogo_de_Produtos_HostAddress}}/api/produto/3
+GET {{Catalogo_de_Produtos_HostAddress}}/api/produto/1
 
 ### Criar nova produto
 POST {{Catalogo_de_Produtos_HostAddress}}/api/produto
@@ -63,3 +63,13 @@ Content-Type: application/json
 
 ### Deletar produto
 DELETE {{Catalogo_de_Produtos_HostAddress}}/api/produto/3
+
+### Registrar novo usuario
+POST {{Catalogo_de_Produtos_HostAddress}}/api/auth/cadastro
+Content-Type: application/json
+
+{
+  "fullName": "Rodrigo Abed de Andrade",
+  "email": "abed@teste.com",
+  "senha": "Abed@123"
+}
