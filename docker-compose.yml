@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   prometheus:
     image: prom/prometheus
@@ -8,4 +6,11 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana-lab
+    ports:
+      - "3000:3000"
     restart: unless-stopped
