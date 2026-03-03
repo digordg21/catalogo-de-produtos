@@ -62,6 +62,14 @@ public class CategoriaController : ControllerBase
         return NoContent();
     }
 
+    // Simulador de erro 500
+    [Authorize]
+    [HttpGet("erro")]
+    public IActionResult Error()
+    {
+        return StatusCode(500, "Erro interno do servidor :)");
+    }
+
     // Atualizar uma categoria por id
     [Authorize]
     [HttpPut("{id}")]
