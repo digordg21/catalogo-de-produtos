@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo de Produtos</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
+    .container { max-width: 1000px; margin: 24px auto; padding: 0 16px; }
+    .card { background: #fff; border-radius: 10px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    h1, h2 { margin-top: 0; }
+    form { display: grid; gap: 8px; }
+    input, select, button { padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
+    button { cursor: pointer; background: #1976d2; color: #fff; border: none; }
+    button.secondary { background: #666; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    ul { list-style: none; padding: 0; margin: 0; }
+    li { padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; gap: 8px; }
+    .muted { color: #666; font-size: 13px; }
+    .status { padding: 8px; border-radius: 8px; background: #e3f2fd; color: #0d47a1; margin-bottom: 12px; }
+    .actions { display: flex; gap: 8px; }
+    .danger { background: #c62828; }
+    @media (max-width: 760px) { .row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Catálogo de Produtos</h1>
+    <p class="muted">Tela simples consumindo as APIs de autenticação, categorias e produtos já existentes.</p>
+
+    <div id="status" class="status">Faça login para começar.</div>
+
+    <div class="row">
+      <section class="card">
+        <h2>Autenticação</h2>
+        <form id="registerForm">
+          <input id="registerName" placeholder="Nome completo" required />
+          <input id="registerEmail" type="email" placeholder="Email" required />
+          <input id="registerPassword" type="password" placeholder="Senha" required />
+          <button type="submit" class="secondary">Cadastrar</button>
+        </form>
+        <hr />
+        <form id="loginForm">
+          <input id="loginEmail" type="email" placeholder="Email" required />
+          <input id="loginPassword" type="password" placeholder="Senha" required />
+          <button type="submit">Entrar</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Categorias</h2>
+        <form id="categoriaForm">
+          <input id="categoriaNome" placeholder="Nova categoria" required />
+          <button type="submit">Criar categoria</button>
+        </form>
+        <ul id="categoriasList"></ul>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Produtos</h2>
+      <form id="produtoForm">
+        <input id="produtoNome" placeholder="Nome do produto" required />
+        <input id="produtoPreco" type="number" min="0" step="0.01" placeholder="Preço" required />
+        <select id="produtoCategoria" required></select>
+        <button type="submit">Criar produto</button>
+      </form>
+      <ul id="produtosList"></ul>
+    </section>
+  </div>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    let token = localStorage.getItem('token') || '';
+
+    function setStatus(message) {
+      statusEl.textContent = message;
+    }
+
+    function authHeaders() {
+      return token ? { Authorization: `Bearer ${token}` } : {};
+    }
+
+    async function request(url, options = {}) {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeaders(),
+          ...(options.headers || {})
+        }
+      });
+
+      if (!response.ok) {
+        let message = `Erro ${response.status}`;
+        try {
+          const data = await response.json();
+          message = typeof data === 'string' ? data : JSON.stringify(data);
+        } catch {
+          message = await response.text();
+        }
+        throw new Error(message);
+      }
+
+      if (response.status === 204) return null;
+      return response.json();
+    }
+
+    async function loadCategorias() {
+      const categorias = await request('/api/categoria');
+      const list = document.getElementById('categoriasList');
+      const select = document.getElementById('produtoCategoria');
+
+      list.innerHTML = '';
+      select.innerHTML = '';
+
+      categorias.forEach(c => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${c.nome}</span><div class="actions"><button class="danger" data-id="${c.id}">Excluir</button></div>`;
+        li.querySelector('button').addEventListener('click', async () => {
+          await request(`/api/categoria/${c.id}`, { method: 'DELETE' });
+          await loadCategorias();
+          await loadProdutos();
+        });
+        list.appendChild(li);
+
+        const option = document.createElement('option');
+        option.value = c.id;
+        option.textContent = `${c.id} - ${c.nome}`;
+        select.appendChild(option);
+      });
+    }
+
+    async function loadProdutos() {
+      const produtos = await request('/api/produto');
+      const list = document.getElementById('produtosList');
+      list.innerHTML = '';
+
+      produtos.forEach(p => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${p.nome} - R$ ${Number(p.preco).toFixed(2)} (Categoria ${p.categoriaId})</span><div class="actions"><button class="danger" data-id="${p.id}">Excluir</button></div>`;
+        li.querySelector('button').addEventListener('click', async () => {
+          await request(`/api/produto/${p.id}`, { method: 'DELETE' });
+          await loadProdutos();
+        });
+        list.appendChild(li);
+      });
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await request('/api/auth/cadastro', {
+          method: 'POST',
+          body: JSON.stringify({
+            fullName: document.getElementById('registerName').value,
+            email: document.getElementById('registerEmail').value,
+            senha: document.getElementById('registerPassword').value
+          }),
+          headers: {}
+        });
+        setStatus('Usuário cadastrado com sucesso. Agora faça login.');
+      } catch (err) {
+        setStatus(err.message);
+      }
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        const data = await request('/api/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: document.getElementById('loginEmail').value,
+            password: document.getElementById('loginPassword').value
+          }),
+          headers: {}
+        });
+
+        token = data.token;
+        localStorage.setItem('token', token);
+        setStatus('Login realizado com sucesso.');
+        await loadCategorias();
+        await loadProdutos();
+      } catch (err) {
+        setStatus(err.message);
+      }
+    });
+
+    document.getElementById('categoriaForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await request('/api/categoria', {
+          method: 'POST',
+          body: JSON.stringify({ nome: document.getElementById('categoriaNome').value })
+        });
+        document.getElementById('categoriaNome').value = '';
+        await loadCategorias();
+      } catch (err) {
+        setStatus(err.message);
+      }
+    });
+
+    document.getElementById('produtoForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await request('/api/produto', {
+          method: 'POST',
+          body: JSON.stringify({
+            nome: document.getElementById('produtoNome').value,
+            preco: Number(document.getElementById('produtoPreco').value),
+            categoriaId: Number(document.getElementById('produtoCategoria').value)
+          })
+        });
+        document.getElementById('produtoNome').value = '';
+        document.getElementById('produtoPreco').value = '';
+        await loadProdutos();
+      } catch (err) {
+        setStatus(err.message);
+      }
+    });
+
+    if (token) {
+      setStatus('Token encontrado. Carregando dados...');
+      Promise.all([loadCategorias(), loadProdutos()])
+        .then(() => setStatus('Sessão carregada com sucesso.'))
+        .catch((err) => setStatus(`Falha ao carregar sessão: ${err.message}`));
+    }
+  </script>
+</body>
+</html>
