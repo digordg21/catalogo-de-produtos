@@ -6,9 +6,23 @@ using System.Text;
 using Catalogo.Data.Repository;
 using Catalogo.Data;
 using Catalogo.Models;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Adicionar OpenTelemetry
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource =>
+        resource.AddService(serviceName: "rod-api-lab"))
+    .WithMetrics(metrics =>
+    {
+        metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddRuntimeInstrumentation()
+            .AddPrometheusExporter();
+    });
 
 // Adicionar suporte a controllers
 builder.Services.AddControllers();
@@ -52,6 +66,7 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
+app.MapPrometheusScrapingEndpoint();
 
 // Configurar Swagger
 if (app.Environment.IsDevelopment())
@@ -69,5 +84,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers(); // 👈 Habilita Controllers
+
 
 app.Run();
