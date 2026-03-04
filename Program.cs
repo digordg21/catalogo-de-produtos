@@ -9,6 +9,9 @@ using Catalogo.Models;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Serilog;
+using Serilog.Events;
+using Serilog.Enrichers.Span;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,9 +81,29 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Configurar Serilog
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .Enrich.FromLogContext()
+    .Enrich.WithMachineName()
+    .Enrich.WithThreadId()
+    .Enrich.WithSpan() // <- pega TraceId automaticamente
+    .WriteTo.Console(new Serilog.Formatting.Json.JsonFormatter())
+    .WriteTo.File(
+    new Serilog.Formatting.Json.JsonFormatter(),
+    "logs/log-.json",
+    rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
 var app = builder.Build();
 
+// Endpoint para métricas do Prometheus
 app.MapPrometheusScrapingEndpoint();
+
+// adicionando serilog request logging
+app.UseSerilogRequestLogging(); // <- isso já loga todas as requisições com TraceId, status code, etc.
 
 // Configurar Swagger
 if (app.Environment.IsDevelopment())

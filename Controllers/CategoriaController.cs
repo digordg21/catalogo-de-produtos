@@ -29,6 +29,7 @@ public class CategoriaController : ControllerBase
         var traceId = Activity.Current?.TraceId.ToString();
 
         _logger.LogInformation("Buscando todas as categorias. TraceId: {TraceId}", traceId);
+        _logger.LogTrace("Buscando todas as categorias. TraceId: {TraceId}", traceId);
         
         return categoriaRepository.GetAll();
     }
