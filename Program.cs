@@ -1,4 +1,4 @@
- using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -8,6 +8,7 @@ using Catalogo.Data;
 using Catalogo.Models;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +21,21 @@ builder.Services.AddOpenTelemetry()
         metrics
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
-            .AddRuntimeInstrumentation()
+            .AddMeter("rod-api-custom-metrics")
             .AddPrometheusExporter();
+    })
+    // Configurar tracing 
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddEntityFrameworkCoreInstrumentation()
+            .AddSource("Microsoft.Data.Sqlite") // para capturar queries do EF Core
+            .AddOtlpExporter(options =>
+            {
+                options.Endpoint = new Uri("http://localhost:4317");
+            });
     });
 
 // Adicionar suporte a controllers
