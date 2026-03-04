@@ -3,6 +3,8 @@ using Catalogo.Data.Repository;
 using Catalogo.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace Categorias.Controllers;
 
@@ -12,9 +14,11 @@ namespace Categorias.Controllers;
 public class CategoriaController : ControllerBase
 {
     CategoriaRepository categoriaRepository;
-    public CategoriaController(CategoriaRepository _repository)
+    private readonly ILogger<CategoriaController> _logger;
+    public CategoriaController(CategoriaRepository _repository, ILogger<CategoriaController> logger)
     {
         categoriaRepository = _repository;
+        _logger = logger;
     }
 
     // Listar todas as categorias
@@ -22,6 +26,10 @@ public class CategoriaController : ControllerBase
     [HttpGet]
     public ActionResult<List<Categoria>> GetAll()
     {
+        var traceId = Activity.Current?.TraceId.ToString();
+
+        _logger.LogInformation("Buscando todas as categorias. TraceId: {TraceId}", traceId);
+        
         return categoriaRepository.GetAll();
     }
 
@@ -67,6 +75,8 @@ public class CategoriaController : ControllerBase
     [HttpGet("erro")]
     public IActionResult Error()
     {
+        var traceId = Activity.Current?.TraceId.ToString();
+        _logger.LogInformation("Simulando erro 500 para teste de tracing. TraceId: {TraceId}", traceId);
         return StatusCode(500, "Erro interno do servidor :)");
     }
 
