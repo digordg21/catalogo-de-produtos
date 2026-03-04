@@ -6,40 +6,15 @@ using System.Text;
 using Catalogo.Data.Repository;
 using Catalogo.Data;
 using Catalogo.Models;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
+using Catalogo.ObservabilityLab.Observability;
 using Serilog;
 using Serilog.Events;
 using Serilog.Enrichers.Span;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Adicionar OpenTelemetry
-builder.Services.AddOpenTelemetry()
-    .ConfigureResource(resource =>
-        resource.AddService(serviceName: "rod-api-lab"))
-    .WithMetrics(metrics =>
-    {
-        metrics
-            .AddAspNetCoreInstrumentation()
-            .AddHttpClientInstrumentation()
-            .AddMeter("rod-api-custom-metrics")
-            .AddPrometheusExporter();
-    })
-    // Configurar tracing 
-    .WithTracing(tracing =>
-    {
-        tracing
-            .AddAspNetCoreInstrumentation()
-            .AddHttpClientInstrumentation()
-            .AddEntityFrameworkCoreInstrumentation()
-            .AddSource("Microsoft.Data.Sqlite") // para capturar queries do EF Core
-            .AddOtlpExporter(options =>
-            {
-                options.Endpoint = new Uri("http://localhost:4317");
-            });
-    });
+// nova configuração do OpenTelemetry, extraída para classe separada para deixar o Program.cs mais limpo
+builder.Services.AddCustomOpenTelemetry();
 
 // Adicionar suporte a controllers
 builder.Services.AddControllers();
@@ -81,21 +56,24 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Configurar Serilog
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .Enrich.FromLogContext()
-    .Enrich.WithMachineName()
-    .Enrich.WithThreadId()
-    .Enrich.WithSpan() // <- pega TraceId automaticamente
-    .WriteTo.Console(new Serilog.Formatting.Json.JsonFormatter())
-    .WriteTo.File(
-    new Serilog.Formatting.Json.JsonFormatter(),
-    "logs/log-.json",
-    rollingInterval: RollingInterval.Day)
-    .CreateLogger();
+// Configurar Serilog -- antigo
+// Log.Logger = new LoggerConfiguration()
+//     .MinimumLevel.Information()
+//     .Enrich.FromLogContext()
+//     .Enrich.WithMachineName()
+//     .Enrich.WithThreadId()
+//     .Enrich.WithSpan() // <- pega TraceId automaticamente
+//     .WriteTo.Console(new Serilog.Formatting.Json.JsonFormatter())
+//     .WriteTo.File(
+//     new Serilog.Formatting.Json.JsonFormatter(),
+//     "logs/log-.json",
+//     rollingInterval: RollingInterval.Day)
+//     .CreateLogger();
 
-builder.Host.UseSerilog();
+// builder.Host.UseSerilog();
+
+// nova configuração do Serilog, extraída para classe separada para deixar o Program.cs mais limpo
+builder.Host.UseCustomSerilog();
 
 var app = builder.Build();
 

@@ -35,3 +35,13 @@ services:
       - ./promtail-config.yml:/etc/promtail/config.yml
       - ./logs:/logs
     command: -config.file=/etc/promtail/config.yml
+
+  postgres:
+    image: postgres:15
+    container_name: observability_postgres
+    environment:
+      POSTGRES_USER: lab
+      POSTGRES_PASSWORD: lab
+      POSTGRES_DB: labdb
+    ports:
+      - "5432:5432"
